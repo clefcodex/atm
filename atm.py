@@ -1,54 +1,72 @@
 import datetime
 import random
+import validations
+
 
 allowedUsers = {}
 availableBalance = 9000000
 
 
-def init():
-    print("Welcome to JavaScript Bank")
+print("Welcome to JavaScript Bank")
 
-    def initialization():
-        haveAccount = int(input("Do you have an account with us: 1 (yes) 2 (no): "))
-        if(haveAccount == 1):
-            login()
-        elif(haveAccount == 2):
-            register()
-        else:
-            print("You have selected invalid option")
-            initialization()
-               
-    initialization()
+
+def initialization():
+    haveAccount = int(input("Do you have an account with us: 1 (yes) 2 (no): "))
+    if(haveAccount == 1):
+        login()
+    elif(haveAccount == 2):
+        register()
+    else:
+        print("You have selected invalid option")
+        initialization()
 
 
 
 def withdrawalOperation():
+    withdrawal_successful = False
     global availableBalance
-    print(f'Your current balance is: N{availableBalance}')
-    amountWithdraw = int(input('How much would you like to withdraw: '))
-    if(amountWithdraw < availableBalance):
-        print(f'Take your cash N{amountWithdraw}')
-        availableBalance -= amountWithdraw
-        print(f'Your available balance is: N{availableBalance}')
-        print('Thank you for banking with us')
-    else:
-        print(f'You can not withdraw more than N{availableBalance}, try again')
-        withdrawalOperation()
+
+    while withdrawal_successful == False:
+        print(f'Your current balance is: N{availableBalance}')
+        amountWithdraw = input('How much would you like to withdraw: ')
+        is_valid_amount = validations.validate_withdrawal(amountWithdraw)
+        if is_valid_amount:
+            if(int(is_valid_amount) < availableBalance):
+                withdrawal_successful = True
+                print(f'Take your cash N{int(is_valid_amount)}')
+                availableBalance -= int(is_valid_amount)
+                print(f'Your available balance is: N{availableBalance}')
+                print('Thank you for banking with us')
+            else:
+                print(f'You can not withdraw more than N{availableBalance}, try again')
+                withdrawalOperation()
 
 
 
 def cashDepositOperation():
     global availableBalance
-    print(f'Your current balance is: N{availableBalance}')
-    deposit = int(input('How much would you like to deposit?: '))
-    availableBalance += deposit
-    print(f'Your current balance is: N{availableBalance}')
-    print('Thank you for banking with us')
+    cash_deposit_successful = False
+
+    while cash_deposit_successful == False:
+        print(f'Your current balance is: N{availableBalance}')
+        deposit = input('How much would you like to deposit?: ')
+        is_valid_amount = validations.validate_deposit(deposit)
+        if is_valid_amount:
+            cash_deposit_successful = True
+            availableBalance += int(is_valid_amount)
+            print(f'Your current balance is: N{availableBalance}')
+            print('Thank you for banking with us')
 
 
 def handleCompliat():
-    complait =  input("What issue will you like to report? \n")
-    print("Thank you for contacting us")
+    complait_successful = False
+
+    while complait_successful == False:
+        complait = input("What issue will you like to report? \n")
+        is_valid_complait = validations.validate_complait(complait)
+        if is_valid_complait:
+            complait_successful = True
+            print("Thank you for contacting us")
 
 
 
@@ -103,25 +121,31 @@ def login():
     isLoginSuccessful = False
     
     while isLoginSuccessful == False:
-        accountNumberFromUser = int(input("Enter your account number: "))
-        passwordFromUser = input("Enter your password: ")
-        accountNumber = next(iter(allowedUsers))
-        user = allowedUsers[accountNumber]
-        if(accountNumber == accountNumberFromUser):
-            if(user[3] == passwordFromUser):
-                isLoginSuccessful = True
-                loginTime = datetime.datetime.now()
-                print(f'Welcome {user[0]}')
-                print(f'Today: {loginTime.strftime("%a")}, {loginTime.strftime("%B")} {loginTime.strftime("%d")} {loginTime.strftime("%Y")} - {loginTime.strftime("%H")}:{loginTime.strftime("%M")}:{loginTime.strftime("%S")}')
-                bankOperations()
+        accountNumberFromUser = input("Enter your account number: ")
+        is_valid_account_number = validations.account_number_validation(accountNumberFromUser)
+
+        if is_valid_account_number:
+            passwordFromUser = input("Enter your password: ")
+            accountNumber = next(iter(allowedUsers))
+            user = allowedUsers[accountNumber]
+            if(accountNumber == int(accountNumberFromUser)):
+                print("Account Number is Correct")
+                if(user[3] == passwordFromUser):
+                    isLoginSuccessful = True
+                    loginTime = datetime.datetime.now()
+                    print(f'Welcome {user[0]}')
+                    print(f'Today: {loginTime.strftime("%a")}, {loginTime.strftime("%B")} {loginTime.strftime("%d")} {loginTime.strftime("%Y")} - {loginTime.strftime("%H")}:{loginTime.strftime("%M")}:{loginTime.strftime("%S")}')
+                    bankOperations()
+                else:
+                    print("Invalid account or password")
             else:
                 print("Invalid account or password")
+                print("Account Number is Never Correct")
         else:
-            print("Invalid account or password")
-
+            initialization()
 
 ### ATM System ###
-init()
+initialization()
 
 
 
